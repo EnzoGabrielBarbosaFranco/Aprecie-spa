@@ -1,19 +1,24 @@
 import { Box, Button, Grid, TextField } from '@mui/material';
 import { SaveOutlined } from '@mui/icons-material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import IColaborador from '../../types/IColaborador';
 import axios from 'axios';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const data = {
   colaboradores: [] as IColaborador[]
 };
 
+
 interface Props {
   token: any
 }
 
-export default function FormularioCadastroColaborador({token} : Props) {
 
+export default function FormularioCadastroColaborador({ token }: Props) {
+  
   const [colaborador, setColaborador] = useState<IColaborador>({
     id: 0,
     nome: '',
@@ -21,6 +26,19 @@ export default function FormularioCadastroColaborador({token} : Props) {
     data_de_nascimento: '',
     usuario_id_do_chat: ''
   });
+  const params = useParams();
+  if(params.id) {
+    useEffect(() => {
+      axios.get(`http://127.0.0.1:8000/reconhecimentos/colaborador/${params.id}`)
+        .then(resposta => {
+          setColaborador(resposta.data);
+        })
+        .catch(erro => {
+          console.log(erro);
+        });
+    }, []);
+  }
+
 
   const cadastrar = (evento: React.FormEvent<HTMLFormElement>) => {
     evento.preventDefault();
@@ -73,7 +91,7 @@ export default function FormularioCadastroColaborador({token} : Props) {
 
           <Grid item xs={12}>
             <Button variant="contained" type="submit" endIcon={<SaveOutlined />}>
-                            CADASTRAR
+              CADASTRAR
             </Button>
           </Grid>
         </Grid>
